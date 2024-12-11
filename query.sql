@@ -81,3 +81,58 @@ JOIN jeu ON emprunt.id_jeu = jeu.id_jeu;
 SELECT memebre.pseaudo, abonnement.type_abonnement
 FROM abonnement
 JOIN memebre ON abonnement.id_membre = memebre.id_membre;
+
+
+-- Calculer le nombre total de jeux disponibles par genre:
+
+SELECT genre, COUNT(*) AS total_jeux
+FROM jeu
+GROUP BY genre;
+
+-- Trouver le tournoi avec le plus grand nombre de participants:
+
+SELECT tournoi.nom_tournoi, COUNT(participation.id_membre) AS nombre_participants
+FROM tournoi
+JOIN participation ON tournoi.id_tournoi = participation.id_tournoi
+GROUP BY tournoi.nom_tournoi
+ORDER BY nombre_participants DESC
+LIMIT 1;
+
+-- Afficher le nombre demprunts réalisés par chaque membre:
+
+SELECT memebre.pseaudo, COUNT(emprunt.id_emprunt) AS nombre_emprunts
+FROM memebre
+JOIN emprunt ON memebre.id_membre = emprunt.id_membre
+GROUP BY memebre.pseaudo;
+
+
+
+-- Afficher les jeux sortis après une certaine année, triés par ordre alphabétique:
+
+SELECT titre, annee_sortie
+FROM jeu
+WHERE annee_sortie > 2020 
+ORDER BY titre ASC;
+
+-- Trouver les membres qui ont emprunté un jeu, mais ne l'ont pas encore rendu:
+
+SELECT memebre.pseaudo, jeu.titre
+FROM emprunt
+JOIN memebre ON emprunt.id_membre = memebre.id_membre
+JOIN jeu ON emprunt.id_jeu = jeu.id_jeu
+WHERE emprunt.date_retour_reelle IS NULL;
+
+-- Lister les tournois ayant eu lieu entre deux dates spécifiques:
+
+SELECT nom_tournoi, date_tournoi, recompenses
+FROM tournoi
+WHERE date_tournoi BETWEEN '2023-01-01' AND '2023-12-31';
+
+-- Afficher les membres avec plusieurs emprunts actifs:
+
+SELECT memebre.pseaudo, COUNT(emprunt.id_emprunt) AS emprunts_actifs
+FROM memebre
+JOIN emprunt ON memebre.id_membre = emprunt.id_membre
+WHERE emprunt.date_retour_reelle IS NULL
+GROUP BY memebre.pseaudo
+HAVING COUNT(emprunt.id_emprunt) > 1;
